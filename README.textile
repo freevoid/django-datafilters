@@ -1,0 +1,37 @@
+h1. General
+
+Library for django-powered websites to implement data filtering without gore.
+
+This library provides decorator for django views (@filter_powered@) and
+small framework to create so-called FilterForm classes that declaratively
+define filter specifications.
+
+This approach is somewhat differs from one in django-admin, but it looks much
+more intuitive and straightforward imho.
+
+h2. Main limitation
+
+Views that "powered" with filter expected to return _bare context dictionaries_
+(to get the context and data to filter) so decorator returns dictionary too.
+Tuples in form @(<template_name>, <template_context>)@ will be properly handled
+too. Other types (@HttpResponse@ it common case) are silently ignored and
+bypassed by decorator.
+
+This sounds tricky, but it is easier way to work with views:
+
+* Return dict-like object instead of render_to_response(...) stuff;
+* Actually render template in top-level decorator like this:
+
+bc. @render_to("foo/bar.html")
+def bar(request):
+    some_result = do_smth(request)
+    return {'result': some_result}
+
+@render_to@ decorator implementation is trivial and therefore omitted. In such
+way we can hook anything between @render_to@ and template context and thus
+isolate common context processing tasks (like filtering) and reuse them.
+
+TODO: Examples, more info about @FilterForm@, @FilterSpec@ and @filter_powered@.
+
+(C) 2010, Nikolay Zakharov
+
