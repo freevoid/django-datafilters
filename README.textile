@@ -31,6 +31,11 @@ def bar(request):
 way we can hook anything between @render_to@ and template context and thus
 isolate common context processing tasks (like filtering) and reuse them.
 
+h2. Requirements
+
+* Django (1.2 will be just fine);
+* "django-forms-extras":http://github.com/freevoid/django-forms-extras for some of builtin specifications.
+
 TODO: Examples, more info about @FilterForm@, @FilterSpec@ and @filter_powered@.
 
 (C) 2010, Nikolay Zakharov
