@@ -1,3 +1,5 @@
+import itertools
+
 from django import forms
 from django.utils.copycompat import deepcopy
 from django.db.models import Q
@@ -11,6 +13,8 @@ class FilterForm(forms.Form):
             'filter_specs_base')
 
     default_fields_args = {'required': False}
+
+    fields_per_column = 4 # for default get_columns() implementation
 
     def __init__(self, data=None, **kwargs):
         self.complex_conditions = []
@@ -56,4 +60,25 @@ class FilterForm(forms.Form):
     def is_empty(self):
         return self.is_valid() and not self.cleaned_data\
                 and not self.complex_conditions
+
+    def get_columns(self):
+        '''
+        Returns iterator that yields a column (iterator too).
+        By default, flat field list is divided in columns with
+        fields_per_column elements in each (fields_per_column is a
+        class attribute).
+
+        This function can be ignored/overrided without a doubt.
+        '''
+        nfields = len(self.fields)
+        fields_per_column = self.fields_per_column
+
+        ncolumns, tail = divmod(nfields, fields_per_column)
+        for i in range(ncolumns):
+            yield itertools.islice(self, i*fields_per_column,
+                    (i + 1)*fields_per_column)
+        if tail:
+            yield itertools.islice(self, ncolumns*fields_per_column,
+                    ncolumns*fields_per_column + tail)
+
 
