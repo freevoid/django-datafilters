@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-print find_packages('datafilters')
+readme_file = 'README.rst'
 
 setup(
     name='datafilters',
@@ -10,8 +10,9 @@ setup(
     # Metadata
     author='Nikolay Zakharov',
     author_email='nikolay@desh.su',
-    url = 'https://github.com/freevoid/coded_exceptions',
+    url = 'https://github.com/freevoid/django-datafilters',
     description='Neat QuerySet filter for django apps with filterforms based on django forms',
+    long_description=open(readme_file).read(),
     keywords='django filter datafilter queryset',
     license = 'MIT',
     classifiers=[
