@@ -9,11 +9,13 @@ from django import forms
 from datafilters.filterspec import FilterSpec
 
 __all__ = (
-        'GenericSpec',
+        'BoolFilterSpec',
+        'ContainsFilterSpec',
         'DateFieldFilterSpec',
         'DatePickFilterSpec',
-        'ContainsFilterSpec',
-        'BoolFilterSpec',
+        'GenericSpec',
+        'GreaterThanZeroFilterSpec',
+        'SelectBoolFilterSpec',
         )
 
 
