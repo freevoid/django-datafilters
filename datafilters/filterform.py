@@ -7,6 +7,7 @@ from django.db.models import Q
 from datafilters.filterspec import FilterSpec
 from datafilters.declarative import declarative_fields
 
+
 class FilterForm(forms.Form):
 
     __metaclass__ = declarative_fields(FilterSpec, forms.Form.__metaclass__,
@@ -80,5 +81,3 @@ class FilterForm(forms.Form):
         if tail:
             yield itertools.islice(self, ncolumns*fields_per_column,
                     ncolumns*fields_per_column + tail)
-
-
