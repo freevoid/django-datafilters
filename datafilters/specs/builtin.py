@@ -1,6 +1,5 @@
 '''
-Some additional filterspecs that depends on forms_extras package (and thus
-optional).
+Basic filterspecs that can also be used as startpoint for custom ones.
 '''
 import datetime
 
