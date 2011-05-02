@@ -18,6 +18,7 @@ __all__ = (
 
 
 class GenericSpec(FilterSpec):
+
     def __init__(self, field_name, verbose_name, field_cls=forms.CharField, **field_kwargs):
         field_kwargs['label'] = verbose_name
         super(GenericSpec, self).__init__(field_name,
@@ -82,6 +83,7 @@ class DatePickFilterSpec(FilterSpec):
 
 
 class ContainsFilterSpec(FilterSpec):
+
     def __init__(self, field_name, verbose_name):
         super(ContainsFilterSpec, self).__init__(field_name)
         self.filter_field = (forms.CharField, {'label': verbose_name, 'required': False})
@@ -94,11 +96,53 @@ class ContainsFilterSpec(FilterSpec):
 
 
 class BoolFilterSpec(FilterSpec):
+
     def __init__(self, field_name, verbose_name):
         super(BoolFilterSpec, self).__init__(field_name)
         self.filter_field = (forms.BooleanField, {'label': verbose_name, 'required': False})
         self.field_name = field_name
+
     def to_lookup(self, checked):
         if checked is None:
             return {}
         return {self.field_name: checked}
+
+
+class SelectBoolFilterSpec(FilterSpec):
+
+    def __init__(self, field_name, verbose_name, revert=False):
+        super(SelectBoolFilterSpec, self).__init__(field_name)
+        self.filter_field = (forms.ChoiceField,
+                {'label': verbose_name,
+                 'choices': (('all', _('All')),
+                             ('true', _('Yes')),
+                             ('false', _('No')))})
+        self.field_name = field_name
+        self.revert = revert
+
+    def to_lookup(self, choice):
+        if choice is None or choice == 'all' or choice == '':
+            return {}
+        checked = True if choice == 'true' else False
+        if not self.revert:
+            return {self.field_name: checked}
+        else:
+            return {self.field_name: not checked}
+
+
+class GreaterThanZeroFilterSpec(SelectBoolFilterSpec):
+
+    def to_lookup(self, choice):
+        if choice == 'true':
+            checked = True
+        elif choice == 'false':
+            checked = False
+        else:
+            checked = None
+
+        if checked is None:
+            return {}
+        elif checked:
+            return {'%s__gt' % self.field_name: 0}
+        else:
+            return {self.field_name: 0}
