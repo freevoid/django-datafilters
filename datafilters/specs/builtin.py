@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 from datafilters.filterspec import FilterSpec
-from forms_extras.fields import DatePeriodSelectField, NoneBooleanField, DatePeriodField
 
 __all__ = (
         'GenericSpec',
