@@ -8,15 +8,18 @@ def filter_powered(filterform_cls, queryset_name='object_list', pass_params=Fals
         @wraps(view)
         def filter_powered_view(request, *args, **kwargs):
             output = view(request, *args, **kwargs)
-            # Work only with views that returns dict context
-            if isinstance(output, dict):
+            # SimpleTemplateResponse objects have context in `context_data`
+            if hasattr(output, 'context_data'):
+                context = output.context_data
+            # Otherwise, work only with views that returns dict context
+            elif isinstance(output, dict):
                 context = output
-                queryset = output.get(queryset_name)
             elif isinstance(output, tuple):
                 context = output[1]
-                queryset = context.get(queryset_name)
             else:
                 return output
+
+            queryset = context.get(queryset_name)
 
             # XXX Maybe this should be eliminated (if there is no result,
             # do we want to have filterform in context?)
@@ -47,6 +50,8 @@ def filter_powered(filterform_cls, queryset_name='object_list', pass_params=Fals
                 output = context
             elif isinstance(output, tuple):
                 output = (output[0], context)
+            elif hasattr(output, 'context'):
+                output.context = context
             return output
 
         return filter_powered_view
