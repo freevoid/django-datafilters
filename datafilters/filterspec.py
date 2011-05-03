@@ -9,6 +9,8 @@ class DummyFilterChoices:
 
 class FilterSpec(object):
 
+    creation_counter = 0
+
     filter_choices = {}
 
     def __init__(self, field_name, filter_field=None):
@@ -19,6 +21,9 @@ class FilterSpec(object):
 
         if filter_field is not None:
             self.filter_field = filter_field
+
+        self.creation_counter = FilterSpec.creation_counter + 1
+        FilterSpec.creation_counter = self.creation_counter
 
         super(FilterSpec, self).__init__()
 
