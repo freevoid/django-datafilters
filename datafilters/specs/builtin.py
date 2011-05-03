@@ -29,7 +29,7 @@ class GenericSpec(FilterSpec):
 
 class DateFieldFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name, is_datetime=True, **kwargs):
+    def __init__(self, field_name, verbose_name, is_datetime=True, **field_kwargs):
         super(DateFieldFilterSpec, self).__init__(field_name)
 
         self.field_generic = '%s__' % self.field_name
@@ -60,9 +60,11 @@ class DateFieldFilterSpec(FilterSpec):
             ('this_month', _('This month')),
             ('this_year', _('This year')),
                 )
-        self.filter_field = (forms.ChoiceField, {'choices':choices,
+
+        field_kwargs.update({'choices':choices,
             'label':verbose_name,
             'required': False})
+        self.filter_field = (forms.ChoiceField, field_kwargs)
 
 
 class DatePickFilterSpec(FilterSpec):
