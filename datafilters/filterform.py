@@ -51,10 +51,17 @@ class FilterForm(forms.Form):
         self.complex_conditions = complex_conditions
         return data
 
+
+    def get_lookup_args(self):
+        if self.is_valid():
+            return self.complex_conditions, self.cleaned_data
+        else:
+            return (), {}
+
     def filter(self, queryset):
         if self.is_valid():
-            return queryset.filter(*self.complex_conditions,
-                    **self.cleaned_data)
+            complex_conditions, lookup_attributes = self.get_lookup_args()
+            return queryset.filter(*complex_conditions, **lookup_attributes)
         else:
             return queryset
 
