@@ -2,6 +2,7 @@
 Basic filterspecs that can also be used as startpoint for custom ones.
 '''
 import datetime
+import re
 
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -16,6 +17,7 @@ __all__ = (
         'GenericSpec',
         'GreaterThanZeroFilterSpec',
         'SelectBoolFilterSpec',
+        'InFilterSpec',
         )
 
 
@@ -112,13 +114,14 @@ class BoolFilterSpec(FilterSpec):
 
 class SelectBoolFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name, revert=False):
+    def __init__(self, field_name, verbose_name, revert=False, **field_kwargs):
         super(SelectBoolFilterSpec, self).__init__(field_name)
-        self.filter_field = (forms.ChoiceField,
-                {'label': verbose_name,
-                 'choices': (('all', _('All')),
-                             ('true', _('Yes')),
-                             ('false', _('No')))})
+        field_kwargs.update({
+            'label': verbose_name,
+            'choices': (('all', _('All')),
+                ('true', _('Yes')),
+                ('false', _('No')))})
+        self.filter_field = (forms.ChoiceField, field_kwargs)
         self.field_name = field_name
         self.revert = revert
 
@@ -148,3 +151,31 @@ class GreaterThanZeroFilterSpec(SelectBoolFilterSpec):
             return {'%s__gt' % self.field_name: 0}
         else:
             return {self.field_name: 0}
+
+
+class CommaSeparatedCharField(forms.CharField):
+
+    SEPARATORS_RE = re.compile(r'[,;\s]+')
+
+    def clean(self, value):
+
+        value = super(CommaSeparatedCharField, self).clean(value)
+
+        if value:
+            return filter(None, self.SEPARATORS_RE.split(value))
+        else:
+            return []
+
+
+class InFilterSpec(FilterSpec):
+
+    def __init__(self, field_name, verbose_name, **field_kwargs):
+        super(InFilterSpec, self).__init__(field_name)
+        field_kwargs.update({'label': verbose_name, 'required': False})
+        self.filter_field = (CommaSeparatedCharField, field_kwargs)
+        self.field_name = field_name
+
+    def to_lookup(self, values):
+        if not values:
+            return {}
+        return {'%s__in' % self.field_name: values}
