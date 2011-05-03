@@ -5,13 +5,13 @@ optional).
 import datetime
 
 from datafilters.filterspec import FilterSpec
-from forms_extras.fields import (DatePeriodSelectField, NoneBooleanField,
-         DatePeriodField)
+from forms_extras.fields import (NoneBooleanField,
+         DatePeriodField, CommaSeparatedCharField)
 
 __all__ = (
         'DatePeriodFilterSpec',
-        'DatePeriodSelectFilterSpec',
-        'IsNullFilterSpec'
+        'IsNullFilterSpec',
+        'InFilterSpec',
         )
 
 class DatePeriodFilterSpec(FilterSpec):
@@ -37,30 +37,6 @@ class DatePeriodFilterSpec(FilterSpec):
         return retval
 
 
-class DatePeriodSelectFilterSpec(FilterSpec):
-
-    def __init__(self, field_name, verbose_name, **field_kwargs):
-        super(DatePeriodSelectFilterSpec, self).__init__(field_name)
-        field_kwargs['label'] = verbose_name
-        self.filter_field = (DatePeriodSelectField, field_kwargs)
-        self.field_name = field_name
-
-    def to_lookup(self, picked_dates):
-        if not isinstance(picked_dates, tuple):
-            return {}
-
-        retval = {}
-        from_date, to_date = picked_dates
-        if from_date:
-            retval['%s__gte' % self.field_name] = from_date
-
-        if to_date:
-            retval['%s__lte' % self.field_name] = to_date
-            #+ datetime.timedelta(1)
-
-        return retval
-
-
 class IsNullFilterSpec(FilterSpec):
     def __init__(self, field_name, verbose_name, revert=True):
         super(IsNullFilterSpec, self).__init__(field_name)
@@ -75,3 +51,17 @@ class IsNullFilterSpec(FilterSpec):
             return {self.lookup: not checked}
         else:
             return {self.lookup: checked}
+
+
+class InFilterSpec(FilterSpec):
+
+    def __init__(self, field_name, verbose_name, **field_kwargs):
+        super(InFilterSpec, self).__init__(field_name)
+        field_kwargs.update({'label': verbose_name, 'required': False})
+        self.filter_field = (CommaSeparatedCharField, field_kwargs)
+        self.field_name = field_name
+
+    def to_lookup(self, values):
+        if not values:
+            return {}
+        return {'%s__in' % self.field_name: values}
