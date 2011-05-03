@@ -4,7 +4,7 @@ readme_file = 'README.rst'
 
 setup(
     name='datafilters',
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages('.'),
 
     # Metadata
