@@ -6,6 +6,10 @@ setup(
     name='datafilters',
     version='0.1.2',
     packages=find_packages('.'),
+    package_data = {'': [
+        'locale/*/LC_MESSAGES/django.po',
+        'locale/*/LC_MESSAGES/django.mo',
+    ]},
 
     # Metadata
     author='Nikolay Zakharov',
