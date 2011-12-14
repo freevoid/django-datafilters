@@ -29,3 +29,11 @@ class FilterSpec(object):
 
     def to_lookup(self, cleaned_value):
         return self.filter_choices.get(cleaned_value, {})
+
+
+class RuntimeAwareFilterSpecMixin(object):
+    '''
+    Mixin class to recognize filter specs that aware of runtime context
+    (accepts runtime_context in to_lookup()).
+    '''
+    pass
