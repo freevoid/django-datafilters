@@ -44,13 +44,15 @@ class FilterForm(forms.Form):
         for name, spec in self.filter_specs.iteritems():
             raw_value = self.cleaned_data.get(name)
             if isinstance(spec, RuntimeAwareFilterSpecMixin):
-                spec.to_lookup(raw_value, runtime_context=self.runtime_context)
+                lookup_or_condition = spec.to_lookup(raw_value, runtime_context=self.runtime_context)
             else:
                 lookup_or_condition = spec.to_lookup(raw_value)
+
             if isinstance(lookup_or_condition, Q):
                 complex_conditions.append(lookup_or_condition)
-            else:
+            elif lookup_or_condition is not None:
                 data.update(lookup_or_condition)
+
         self.complex_conditions = complex_conditions
         return data
 
