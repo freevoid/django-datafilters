@@ -69,10 +69,14 @@ class DateFieldFilterSpec(FilterSpec):
 
 class DatePickFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name):
+    def __init__(self, field_name, verbose_name, **field_kwargs):
         super(DatePickFilterSpec, self).__init__(field_name)
-        self.filter_field = (forms.DateField, {'initial': datetime.date.today,
-            'label': verbose_name})
+        _field_kwargs = {
+            'initial': datetime.date.today,
+            'label': verbose_name
+        }
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (forms.DateField, field_kwargs)
         self.filter_choices = type('',(),{})
 
         def get(picked_date, default):
@@ -88,9 +92,11 @@ class DatePickFilterSpec(FilterSpec):
 
 class ContainsFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name):
+    def __init__(self, field_name, verbose_name, **field_kwargs):
         super(ContainsFilterSpec, self).__init__(field_name)
-        self.filter_field = (forms.CharField, {'label': verbose_name, 'required': False})
+        _field_kwargs = {'label': verbose_name, 'required': False}
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (forms.CharField, _field_kwargs)
         self.field_name = field_name
 
     def to_lookup(self, substring):
@@ -101,9 +107,11 @@ class ContainsFilterSpec(FilterSpec):
 
 class BoolFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name):
+    def __init__(self, field_name, verbose_name, **field_kwargs):
         super(BoolFilterSpec, self).__init__(field_name)
-        self.filter_field = (forms.BooleanField, {'label': verbose_name, 'required': False})
+        _field_kwargs = {'label': verbose_name, 'required': False}
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (forms.BooleanField, _field_kwargs)
         self.field_name = field_name
 
     def to_lookup(self, checked):
@@ -116,11 +124,13 @@ class SelectBoolFilterSpec(FilterSpec):
 
     def __init__(self, field_name, verbose_name, revert=False, **field_kwargs):
         super(SelectBoolFilterSpec, self).__init__(field_name)
-        field_kwargs.update({
+        _field_kwargs = {
             'label': verbose_name,
             'choices': (('all', _('All')),
                 ('true', _('Yes')),
-                ('false', _('No')))})
+                ('false', _('No')))
+        }
+        _field_kwargs.update(field_kwargs)
         self.filter_field = (forms.ChoiceField, field_kwargs)
         self.field_name = field_name
         self.revert = revert

@@ -18,8 +18,9 @@ class DatePeriodFilterSpec(FilterSpec):
 
     def __init__(self, field_name, verbose_name, **field_kwargs):
         super(DatePeriodFilterSpec, self).__init__(field_name)
-        field_kwargs['label'] = verbose_name
-        self.filter_field = (DatePeriodField, field_kwargs)
+        _field_kwargs = {'label': verbose_name}
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (DatePeriodField, _field_kwargs)
 
     def to_lookup(self, picked_dates):
         if not isinstance(picked_dates, dict):
@@ -38,9 +39,11 @@ class DatePeriodFilterSpec(FilterSpec):
 
 
 class IsNullFilterSpec(FilterSpec):
-    def __init__(self, field_name, verbose_name, revert=True):
+    def __init__(self, field_name, verbose_name, revert=True, **field_kwargs):
         super(IsNullFilterSpec, self).__init__(field_name)
-        self.filter_field = (NoneBooleanField, {'label': verbose_name, 'required': False})
+        _field_kwargs = {'label': verbose_name, 'required': False}
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (NoneBooleanField, _field_kwargs)
         self.revert = revert
         self.lookup = '%s__isnull' % field_name
 
@@ -57,8 +60,9 @@ class InFilterSpec(FilterSpec):
 
     def __init__(self, field_name, verbose_name, **field_kwargs):
         super(InFilterSpec, self).__init__(field_name)
-        field_kwargs.update({'label': verbose_name, 'required': False})
-        self.filter_field = (CommaSeparatedCharField, field_kwargs)
+        _field_kwargs = {'label': verbose_name, 'required': False}
+        _field_kwargs.update(field_kwargs)
+        self.filter_field = (CommaSeparatedCharField, _field_kwargs)
         self.field_name = field_name
 
     def to_lookup(self, values):
