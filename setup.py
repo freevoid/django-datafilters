@@ -4,7 +4,7 @@ readme_file = 'README.rst'
 
 setup(
     name='datafilters',
-    version='0.1.4',
+    version='0.1.5',
     packages=find_packages('.'),
     package_data = {'': [
         'locale/*/LC_MESSAGES/django.po',
