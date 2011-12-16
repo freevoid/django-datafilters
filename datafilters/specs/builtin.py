@@ -131,7 +131,7 @@ class SelectBoolFilterSpec(FilterSpec):
                 ('false', _('No')))
         }
         _field_kwargs.update(field_kwargs)
-        self.filter_field = (forms.ChoiceField, field_kwargs)
+        self.filter_field = (forms.ChoiceField, _field_kwargs)
         self.field_name = field_name
         self.revert = revert
 
