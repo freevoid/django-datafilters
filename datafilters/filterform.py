@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from datafilters.filterspec import FilterSpec, RuntimeAwareFilterSpecMixin
 from datafilters.declarative import declarative_fields
+from datafilters.lookup import Extra
 
 
 class FilterForm(forms.Form):
@@ -19,6 +20,8 @@ class FilterForm(forms.Form):
 
     def __init__(self, data=None, **kwargs):
         self.complex_conditions = []
+        self.extra_conditions = Extra()
+
         if hasattr(self, 'filter_specs') and isinstance(self.filter_specs, tuple):
             self.filter_specs = dict(
                     (fs.field_name, fs) for fs in self.filter_specs
@@ -50,6 +53,8 @@ class FilterForm(forms.Form):
 
             if isinstance(lookup_or_condition, Q):
                 complex_conditions.append(lookup_or_condition)
+            elif isinstance(lookup_or_condition, Extra):
+                self.extra_conditions += lookup_or_condition
             elif lookup_or_condition is not None:
                 data.update(lookup_or_condition)
 
@@ -63,9 +68,18 @@ class FilterForm(forms.Form):
         else:
             return (), {}
 
+    def get_extra_conditions(self):
+        if self.is_valid():
+            return self.extra_conditions
+        else:
+            return None
+
     def filter(self, queryset):
         if self.is_valid():
             complex_conditions, lookup_attributes = self.get_lookup_args()
+            extra_conditions = self.get_extra_conditions()
+            if extra_conditions:
+                queryset = queryset.extra(**extra_conditions.as_kwargs())
             return queryset.filter(*complex_conditions, **lookup_attributes)
         else:
             return queryset
