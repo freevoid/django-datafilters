@@ -11,6 +11,7 @@ class Extra(object):
     def add(self, extra):
         self.where.extend(extra.where)
         self.tables.extend(extra.tables)
+        return self
 
     def as_kwargs(self):
         return {
