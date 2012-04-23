@@ -16,11 +16,13 @@ __all__ = (
 
 class DatePeriodFilterSpec(FilterSpec):
 
+    field_cls = DatePeriodField
+
     def __init__(self, field_name, verbose_name, **field_kwargs):
         super(DatePeriodFilterSpec, self).__init__(field_name)
         _field_kwargs = {'label': verbose_name}
         _field_kwargs.update(field_kwargs)
-        self.filter_field = (DatePeriodField, _field_kwargs)
+        self.filter_field = (self.field_cls, _field_kwargs)
 
     def to_lookup(self, picked_dates):
         if not isinstance(picked_dates, dict):
