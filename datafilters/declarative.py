@@ -1,5 +1,7 @@
 from django.utils.datastructures import SortedDict
 
+__all__ = ('get_declared_fields', 'declarative_fields')
+
 
 def get_declared_fields(bases, attrs, cls_filter,
         with_base_fields=True,

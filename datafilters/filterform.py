@@ -6,16 +6,17 @@ from django.db.models import Q
 
 from datafilters.filterspec import FilterSpec, RuntimeAwareFilterSpecMixin
 from datafilters.declarative import declarative_fields
-from datafilters.lookup import Extra
+from datafilters.extra_lookup import Extra
+
+__all__ = ('FilterForm',)
 
 
 class FilterForm(forms.Form):
 
     __metaclass__ = declarative_fields(FilterSpec, forms.Form.__metaclass__,
-            'filter_specs_base')
+                                       'filter_specs_base')
 
     default_fields_args = {'required': False}
-
     fields_per_column = 4 # for default get_columns() implementation
 
     def __init__(self, data=None, **kwargs):
@@ -60,7 +61,6 @@ class FilterForm(forms.Form):
 
         self.complex_conditions = complex_conditions
         return data
-
 
     def get_lookup_args(self):
         if self.is_valid():

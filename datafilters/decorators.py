@@ -1,5 +1,8 @@
 from functools import wraps
 
+__all__ = ('filter_powered',)
+
+
 def filter_powered(filterform_cls, queryset_name='object_list', pass_params=False,
         add_count=False, aggregate_args={}, values_spec=None, deferred=None):
 

@@ -9,20 +9,18 @@ from forms_extras.fields import (NoneBooleanField,
          DatePeriodField, CommaSeparatedCharField)
 
 __all__ = (
-        'DatePeriodFilterSpec',
-        'IsNullFilterSpec',
-        'InFilterSpec',
-        )
+    'DatePeriodFilterSpec',
+    'IsNullFilterSpec',
+    'InFilterSpec',
+)
 
 class DatePeriodFilterSpec(FilterSpec):
 
     field_cls = DatePeriodField
 
-    def __init__(self, field_name, verbose_name, **field_kwargs):
-        super(DatePeriodFilterSpec, self).__init__(field_name)
-        _field_kwargs = {'label': verbose_name}
-        _field_kwargs.update(field_kwargs)
-        self.filter_field = (self.field_cls, _field_kwargs)
+    def __init__(self, field_name, label=None, **field_kwargs):
+        field_kwargs['label'] = label
+        super(DatePeriodFilterSpec, self).__init__(field_name, **field_kwargs)
 
     def to_lookup(self, picked_dates):
         if not isinstance(picked_dates, dict):
@@ -41,11 +39,12 @@ class DatePeriodFilterSpec(FilterSpec):
 
 
 class IsNullFilterSpec(FilterSpec):
-    def __init__(self, field_name, verbose_name, revert=True, **field_kwargs):
+
+    field_cls = NoneBooleanField
+
+    def __init__(self, field_name, label=None, revert=True, **field_kwargs):
+        field_kwargs['label'] = label
         super(IsNullFilterSpec, self).__init__(field_name)
-        _field_kwargs = {'label': verbose_name, 'required': False}
-        _field_kwargs.update(field_kwargs)
-        self.filter_field = (NoneBooleanField, _field_kwargs)
         self.revert = revert
         self.lookup = '%s__isnull' % field_name
 
@@ -60,12 +59,11 @@ class IsNullFilterSpec(FilterSpec):
 
 class InFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, verbose_name, **field_kwargs):
-        super(InFilterSpec, self).__init__(field_name)
-        _field_kwargs = {'label': verbose_name, 'required': False}
-        _field_kwargs.update(field_kwargs)
-        self.filter_field = (CommaSeparatedCharField, _field_kwargs)
-        self.field_name = field_name
+    field_cls = CommaSeparatedCharField
+
+    def __init__(self, field_name, label=None, **field_kwargs):
+        field_kwargs['label'] = label
+        super(InFilterSpec, self).__init__(field_name, **field_kwargs)
 
     def to_lookup(self, values):
         if not values:
