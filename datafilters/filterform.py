@@ -17,7 +17,7 @@ class FilterForm(forms.Form):
                                        'filter_specs_base')
 
     default_fields_args = {'required': False}
-    fields_per_column = 4 # for default get_columns() implementation
+    fields_per_column = 4
 
     def __init__(self, data=None, **kwargs):
         self.complex_conditions = []
@@ -33,6 +33,7 @@ class FilterForm(forms.Form):
         self.runtime_context = kwargs.pop('runtime_context', {})
 
         super(FilterForm, self).__init__(data=data, **kwargs)
+
         # Generate form fields
         for name, spec in self.filter_specs.iteritems():
             field_cls, local_field_kwargs = spec.filter_field
@@ -43,8 +44,19 @@ class FilterForm(forms.Form):
         self.spec_count = len(self.filter_specs)
 
     def clean(self):
+        '''
+        Cleaning phase of `FilterForm` is aimed to collect arguments for
+        filtering (lookup parameters).
+
+        As a result we will get three new artefacts:
+          * return value: a mapping to use as keyword arguments in `filter`;
+          * `complex_conditions`: a `Q` object to use as a positional argument;
+          * `extra_conditions`: a mapping to use as keyword arguments in
+            `extra`.
+        '''
         data = {}
         complex_conditions = []
+        extra_conditions = Extra()
         for name, spec in self.filter_specs.iteritems():
             raw_value = self.cleaned_data.get(name)
             if isinstance(spec, RuntimeAwareFilterSpecMixin):
@@ -55,14 +67,24 @@ class FilterForm(forms.Form):
             if isinstance(lookup_or_condition, Q):
                 complex_conditions.append(lookup_or_condition)
             elif isinstance(lookup_or_condition, Extra):
-                self.extra_conditions += lookup_or_condition
+                extra_conditions += lookup_or_condition
             elif lookup_or_condition is not None:
                 data.update(lookup_or_condition)
 
         self.complex_conditions = complex_conditions
+        self.extra_conditions = extra_conditions
         return data
 
     def get_lookup_args(self):
+        '''
+        Return arguments for filtering.
+
+        :return:
+            Pair of objects that can be used as `*args, **kwargs` in call to
+            `QuerySet.filter` method.
+
+        NOTE: extra conditions are not handled (so clients should use `filter`)
+        '''
         if self.is_valid():
             return self.complex_conditions, self.cleaned_data
         else:
@@ -75,6 +97,17 @@ class FilterForm(forms.Form):
             return None
 
     def filter(self, queryset):
+        '''
+        Perform filtering on provided queryset.
+
+        >>> form = MyFilterForm(request.GET)
+        >>> filtered_qs = form.filter(MyObject.objects.all())
+
+        :param queryset:
+            QuerySet object to filter
+        :return:
+            Filtered QuerySet object
+        '''
         if self.is_valid():
             complex_conditions, lookup_attributes = self.get_lookup_args()
             extra_conditions = self.get_extra_conditions()
@@ -85,17 +118,21 @@ class FilterForm(forms.Form):
             return queryset
 
     def is_empty(self):
+        '''
+        Return `True` if form is valid and contains an empty lookup.
+        '''
         return self.is_valid() and not self.cleaned_data\
                 and not self.complex_conditions
 
     def get_columns(self):
         '''
-        Returns iterator that yields a column (iterator too).
+        Return iterator that yields a column (iterator too).
+
         By default, flat field list is divided in columns with
         fields_per_column elements in each (fields_per_column is a
         class attribute).
 
-        This function can be ignored/overrided without a doubt.
+        TODO: it is better to use template filters/tags.
         '''
         nfields = len(self.fields)
         fields_per_column = self.fields_per_column

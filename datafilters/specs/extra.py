@@ -1,5 +1,5 @@
 '''
-Some additional filterspecs that depends on forms_extras package (and thus
+Some additional filterspecs that depends on `forms_extras` package (and thus
 optional).
 '''
 import datetime
