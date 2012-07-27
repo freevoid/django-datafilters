@@ -4,7 +4,7 @@ readme_file = 'README.rst'
 
 setup(
     name='datafilters',
-    version='0.1.7',
+    version='0.2.1',
     packages=find_packages('.'),
     package_data = {'': [
         'locale/*/LC_MESSAGES/django.po',
@@ -19,6 +19,10 @@ setup(
     long_description=open(readme_file).read(),
     keywords='django filter datafilter queryset',
     license = 'MIT',
+    install_requires=['django>=1.3'],
+    extra_require={
+        'extra_specs': ['forms-extras'],
+    },
     classifiers=[
           'Development Status :: 4 - Beta',
           'Intended Audience :: Developers',
