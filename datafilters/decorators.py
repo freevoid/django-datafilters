@@ -24,15 +24,8 @@ def filter_powered(filterform_cls, queryset_name='object_list', pass_params=Fals
 
             queryset = context.get(queryset_name)
 
-            # XXX Maybe this should be eliminated (if there is no result,
-            # do we want to have filterform in context?)
-            #if not queryset:
-            #    return output
-
-            if not pass_params:
-                filterform = filterform_cls(request.GET)
-            else:
-                filterform = filterform_cls(request.GET, view_kwargs=kwargs)
+            filterform = filterform_cls(request.GET,
+                                        runtime_context=kwargs)
 
             # Perform actual filtering
             queryset = filterform.filter(queryset)
