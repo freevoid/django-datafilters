@@ -14,6 +14,7 @@ __all__ = (
     'DateFieldFilterSpec',
     'DatePickFilterSpec',
     'GenericSpec',
+    'GreaterThanFilterSpec',
     'GreaterThanZeroFilterSpec',
     'SelectBoolFilterSpec',
 )
@@ -152,7 +153,15 @@ class SelectBoolFilterSpec(FilterSpec):
             return {self.field_name: not checked}
 
 
-class GreaterThanZeroFilterSpec(SelectBoolFilterSpec):
+class GreaterThanFilterSpec(SelectBoolFilterSpec):
+
+    value = 0
+
+    def __init__(self, *args, **kwargs):
+        value = kwargs.pop('value', None)
+        if value is not None:
+            self.value = value
+        super(GreaterThanFilterSpec, self).__init__(*args, **kwargs)
 
     def to_lookup(self, choice):
         if choice == 'true':
@@ -160,11 +169,13 @@ class GreaterThanZeroFilterSpec(SelectBoolFilterSpec):
         elif choice == 'false':
             checked = False
         else:
-            checked = None
-
-        if checked is None:
             return {}
-        elif checked:
-            return {'%s__gt' % self.field_name: 0}
+
+        if checked:
+            return {'%s__gt' % self.field_name: self.value}
         else:
-            return {self.field_name: 0}
+            return {'%s__lte' % self.field_name: self.value}
+
+
+# For backward compatibility
+GreaterThanZeroFilterSpec = GreaterThanFilterSpec
