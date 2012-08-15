@@ -96,7 +96,7 @@ class DatePickFilterSpec(FilterSpec):
         }
 
     def get_field_kwargs(self):
-        kwargs = super(DateFieldFilterSpec, self).get_field_kwargs()
+        kwargs = super(DatePickFilterSpec, self).get_field_kwargs()
         kwargs['initial'] = datetime.date.today
         return kwargs
 
@@ -135,7 +135,7 @@ class SelectBoolFilterSpec(FilterSpec):
         self.revert = revert
 
     def get_field_kwargs(self):
-        kwargs = super(DateFieldFilterSpec, self).get_field_kwargs()
+        kwargs = super(SelectBoolFilterSpec, self).get_field_kwargs()
         kwargs['choices'] = (
             ('all', _('All')),
             ('true', _('Yes')),
