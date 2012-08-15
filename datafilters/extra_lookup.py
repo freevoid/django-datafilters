@@ -1,4 +1,3 @@
-
 class Extra(object):
 
     def __init__(self, where=None, tables=None):
@@ -21,4 +20,4 @@ class Extra(object):
 
     # little magic
     __iadd__ = add
-    __bool__ = is_empty
+    __bool__ = __nonzero__ = is_empty
