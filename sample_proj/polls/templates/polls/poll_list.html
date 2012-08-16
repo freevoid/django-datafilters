@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form method="get" action="">
+        <table>{{ filterform.as_table }}</table>
+        <input type="submit" value="Apply filter" />
+    </form>
+
+    <ul>
+    {% for poll in polls %}
+        <li>{{ poll.question }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
