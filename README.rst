@@ -1,3 +1,6 @@
+.. image:: https://secure.travis-ci.org/freevoid/django-datafilters.png?branch=master
+   :target: http://travis-ci.org/freevoid/django-datafilters
+
 Abstract
 ========
 
