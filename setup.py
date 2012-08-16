@@ -20,7 +20,7 @@ setup(
     keywords='django filter datafilter queryset',
     license = 'MIT',
     install_requires=['django>=1.3'],
-    extra_require={
+    extras_require={
         'extra_specs': ['forms-extras'],
     },
     classifiers=[
