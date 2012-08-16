@@ -35,11 +35,35 @@ class DateFieldFilterSpec(FilterSpec):
 
     field_cls = forms.ChoiceField
 
-    def __init__(self, field_name, label=None, is_datetime=True, **field_kwargs):
+    def __init__(self, field_name, label=None, is_datetime=True,
+            base_date_fun=datetime.date.today, **field_kwargs):
+
         field_kwargs['label'] = label
         super(DateFieldFilterSpec, self).__init__(field_name, **field_kwargs)
         self.is_datetime = is_datetime
-        self.field_generic = '%s__' % self.field_name
+        self.base_date_fun = base_date_fun
+        self.lookup_kwarg_since = '%s__gte' % self.field_name
+        self.lookup_kwarg_until = '%s__lt' % self.field_name
+
+        self.filter_choices = {
+            'all': lambda today, tomorrow: {},
+            'today': lambda today, tomorrow: {
+                self.lookup_kwarg_since: str(today),
+                self.lookup_kwarg_until: str(tomorrow),
+            },
+            'this_week': lambda today, tomorrow: {
+                self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
+                self.lookup_kwarg_until: str(tomorrow),
+            },
+            'this_month': lambda today, tomorrow: {
+                self.lookup_kwarg_since: str(today.replace(day=1)),
+                self.lookup_kwarg_until: str(tomorrow),
+            },
+            'this_year': lambda today, tomorrow: {
+                self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
+                self.lookup_kwarg_until: str(tomorrow),
+            },
+        }
 
     def get_field_kwargs(self):
         kwargs = super(DateFieldFilterSpec, self).get_field_kwargs()
@@ -56,24 +80,10 @@ class DateFieldFilterSpec(FilterSpec):
         if not picked_choice:
             return {}
 
-        field_name = self.field_name
-        today = datetime.date.today()
-        one_week_ago = today - datetime.timedelta(days=7)
-        today_str = (self.is_datetime and
-                        today.strftime('%Y-%m-%d 23:59:59') or
-                        today.strftime('%Y-%m-%d'))
-        filter_choices = {
-                'all': {},
-                'today': {'%s__year' % field_name: str(today.year),
-                        '%s__month' % field_name: str(today.month),
-                        '%s__day' % field_name: str(today.day)},
-                'this_week': {'%s__gte' % field_name: one_week_ago.strftime('%Y-%m-%d'),
-                                '%s__lte' % field_name: today_str},
-                'this_month': {'%s__year' % field_name: str(today.year),
-                                '%s__month' % field_name: str(today.month)},
-                'this_year': {'%s__year' % field_name: str(today.year)}
-            }
-        return filter_choices[picked_choice]
+        today = self.base_date_fun()
+        tomorrow = today + datetime.timedelta(days=1)
+
+        return self.filter_choices[picked_choice](today, tomorrow)
 
 
 class DatePickFilterSpec(FilterSpec):
