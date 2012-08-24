@@ -1,5 +1,3 @@
-import itertools
-
 from django import forms
 from django.utils.copycompat import deepcopy
 from django.db.models import Q
@@ -8,10 +6,17 @@ from datafilters.filterspec import FilterSpec, RuntimeAwareFilterSpecMixin
 from datafilters.declarative import declarative_fields
 from datafilters.extra_lookup import Extra
 
-__all__ = ('FilterForm',)
+__all__ = ('FilterForm', 'ChainingFilterForm', 'FilterFormBase')
 
 
-class FilterForm(forms.Form):
+def join_dicts(dicts):
+    result = {}
+    for d in dicts:
+        result.update(d)
+    return result
+
+
+class FilterFormBase(forms.Form):
 
     __metaclass__ = declarative_fields(FilterSpec, forms.Form.__metaclass__,
                                        'filter_specs_base')
@@ -32,7 +37,7 @@ class FilterForm(forms.Form):
 
         self.runtime_context = kwargs.pop('runtime_context', {})
 
-        super(FilterForm, self).__init__(data=data, **kwargs)
+        super(FilterFormBase, self).__init__(data=data, **kwargs)
 
         # Generate form fields
         for name, spec in self.filter_specs.iteritems():
@@ -54,9 +59,9 @@ class FilterForm(forms.Form):
           * `extra_conditions`: a mapping to use as keyword arguments in
             `extra`.
         '''
-        data = {}
+        simple_lookups = []
         complex_conditions = []
-        extra_conditions = Extra()
+        extra_conditions = []
         for name, spec in self.filter_specs.iteritems():
             raw_value = self.cleaned_data.get(name)
             if isinstance(spec, RuntimeAwareFilterSpecMixin):
@@ -67,13 +72,15 @@ class FilterForm(forms.Form):
             if isinstance(lookup_or_condition, Q):
                 complex_conditions.append(lookup_or_condition)
             elif isinstance(lookup_or_condition, Extra):
-                extra_conditions += lookup_or_condition
+                extra_conditions.append(lookup_or_condition)
             elif lookup_or_condition is not None:
-                data.update(lookup_or_condition)
+                simple_lookups.append(lookup_or_condition)
 
+        self.simple_lookups = simple_lookups
         self.complex_conditions = complex_conditions
         self.extra_conditions = extra_conditions
-        return data
+
+        return {}
 
     def get_lookup_args(self):
         '''
@@ -86,7 +93,7 @@ class FilterForm(forms.Form):
         NOTE: extra conditions are not handled (so clients should use `filter`)
         '''
         if self.is_valid():
-            return self.complex_conditions, self.cleaned_data
+            return self.complex_conditions, join_dicts(self.simple_lookups)
         else:
             return (), {}
 
@@ -108,39 +115,50 @@ class FilterForm(forms.Form):
         :return:
             Filtered QuerySet object
         '''
-        if self.is_valid():
-            complex_conditions, lookup_attributes = self.get_lookup_args()
-            extra_conditions = self.get_extra_conditions()
-            if extra_conditions:
-                queryset = queryset.extra(**extra_conditions.as_kwargs())
-            return queryset.filter(*complex_conditions, **lookup_attributes)
-        else:
-            return queryset
+        raise NotImplementedError
 
     def is_empty(self):
         '''
         Return `True` if form is valid and contains an empty lookup.
         '''
-        return self.is_valid() and not self.cleaned_data\
-                and not self.complex_conditions
+        return (self.is_valid() and
+            not self.simple_lookups and
+            not self.complex_conditions and
+            not self.extra_conditions)
 
-    def get_columns(self):
-        '''
-        Return iterator that yields a column (iterator too).
 
-        By default, flat field list is divided in columns with
-        fields_per_column elements in each (fields_per_column is a
-        class attribute).
+class FilterForm(FilterFormBase):
 
-        TODO: it is better to use template filters/tags.
-        '''
-        nfields = len(self.fields)
-        fields_per_column = self.fields_per_column
+    def filter(self, queryset):
+        if self.is_valid():
+            simple_lookups = self.simple_lookups
+            complex_conditions = self.complex_conditions
+            extra_conditions = self.get_extra_conditions()
+            if extra_conditions:
+                queryset = queryset.extra(**extra_conditions.as_kwargs())
 
-        ncolumns, tail = divmod(nfields, fields_per_column)
-        for i in range(ncolumns):
-            yield itertools.islice(self, i*fields_per_column,
-                    (i + 1)*fields_per_column)
-        if tail:
-            yield itertools.islice(self, ncolumns*fields_per_column,
-                    ncolumns*fields_per_column + tail)
+            lookup = join_dicts(simple_lookups)
+            return queryset.filter(*complex_conditions, **lookup)
+        else:
+            return queryset
+
+
+class ChainingFilterForm(FilterFormBase):
+
+    def filter(self, queryset):
+        if self.is_valid():
+            simple_lookups = self.simple_lookups
+            complex_conditions = self.complex_conditions
+            extra_conditions = self.get_extra_conditions()
+            if extra_conditions:
+                queryset = queryset.extra(**extra_conditions.as_kwargs())
+
+            for lookup in simple_lookups:
+                if lookup:
+                    queryset = queryset.filter(**lookup)
+
+            for query in complex_conditions:
+                if query:
+                    queryset = queryset.filter(query)
+        else:
+            return queryset
