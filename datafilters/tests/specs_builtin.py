@@ -43,6 +43,30 @@ class FilterSpecTestMixin(object):
         self.assertEqual(f['my_field'].label, 'Custom label')
         self.assertIsInstance(f['my_field'].field.widget, forms.Textarea)
 
+    def test_verbose_name_passing(self):
+        args, kwargs = self.get_spec_args()
+        kwargs['label'] = 'Proper label'
+        kwargs['verbose_name'] = 'Old style label'
+        spec = self.spec_cls(*args, **kwargs)
+
+        del kwargs['label']
+        old_style_spec = self.spec_cls(*args, **kwargs)
+
+        del kwargs['verbose_name']
+        if len(args) == 1:
+            args = args + ('Positional verbose name',)
+        oldest_style_spec = self.spec_cls(*args, **kwargs)
+
+        class Form(FilterForm):
+            my_field = spec
+            old_style_field = old_style_spec
+            oldest_style_field = oldest_style_spec
+
+        f = Form()
+        self.assertEqual(f['my_field'].label, 'Proper label')
+        self.assertEqual(f['old_style_field'].label, 'Old style label')
+        self.assertEqual(f['oldest_style_field'].label, 'Positional verbose name')
+
     def test_empty(self):
         '''
         If field value is not provided there should be an empty lookup.

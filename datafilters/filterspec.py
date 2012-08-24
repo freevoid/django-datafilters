@@ -14,8 +14,8 @@ class FilterSpec(object):
 
         # NOTE: Backward compatibility: previously label was provided with
         # `verbose_name` attribute
+        old_label = field_kwargs.pop('verbose_name', None)
         if field_kwargs.get('label') is None:
-            old_label = field_kwargs.pop('verbose_name', None)
             if old_label is not None:
                 field_kwargs['label'] = old_label
 
