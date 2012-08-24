@@ -25,6 +25,7 @@ class FilterFormBase(forms.Form):
     fields_per_column = 4
 
     def __init__(self, data=None, **kwargs):
+        self.simple_lookups = []
         self.complex_conditions = []
         self.extra_conditions = Extra()
 
