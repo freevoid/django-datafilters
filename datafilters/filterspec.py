@@ -11,6 +11,14 @@ class FilterSpec(object):
     field_cls = forms.CharField
 
     def __init__(self, field_name, filter_field=None, **field_kwargs):
+
+        # NOTE: Backward compatibility: previously label was provided with
+        # `verbose_name` attribute
+        if field_kwargs.get('label') is None:
+            old_label = field_kwargs.pop('verbose_name', None)
+            if old_label is not None:
+                field_kwargs['label'] = old_label
+
         self.field_name = field_name
 
         if filter_field is not None:
