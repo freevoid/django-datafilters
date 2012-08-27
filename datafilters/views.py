@@ -23,12 +23,14 @@ class FilterFormMixin(mixin_base):
     '''
 
     filter_form_cls = None
+    use_filter_chaining = False
 
     def get_context_data(self, **kwargs):
         context = kwargs
 
         context['filterform'] = f = self.filter_form_cls(self.request.GET,
-                runtime_context={'user': self.request.user})
+                runtime_context=self.get_runtime_context(),
+                use_filter_chaining=self.use_filter_chaining)
 
         queryset = context['object_list']
 
@@ -36,3 +38,6 @@ class FilterFormMixin(mixin_base):
             context['object_list'] = f.filter(queryset).distinct()
 
         return super(FilterFormMixin, self).get_context_data(**kwargs)
+
+    def get_runtime_context(self):
+        return {'user': self.request.user}
