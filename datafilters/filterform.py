@@ -23,11 +23,19 @@ class FilterFormBase(forms.Form):
 
     default_fields_args = {'required': False}
     fields_per_column = 4
+    use_filter_chaining = False
 
     def __init__(self, data=None, **kwargs):
         self.simple_lookups = []
         self.complex_conditions = []
         self.extra_conditions = Extra()
+
+        use_filter_chaining = kwargs.pop('use_filter_chaining', None)
+        if use_filter_chaining is None:
+            use_filter_chaining = self.use_filter_chaining
+
+        self.filter = self.filter_chaining \
+            if use_filter_chaining else self.filter_bulk
 
         if hasattr(self, 'filter_specs') and isinstance(self.filter_specs, tuple):
             self.filter_specs = dict(
@@ -107,20 +115,6 @@ class FilterFormBase(forms.Form):
         else:
             return None
 
-    def filter(self, queryset):
-        '''
-        Perform filtering on provided queryset.
-
-        >>> form = MyFilterForm(request.GET)
-        >>> filtered_qs = form.filter(MyObject.objects.all())
-
-        :param queryset:
-            QuerySet object to filter
-        :return:
-            Filtered QuerySet object
-        '''
-        raise NotImplementedError
-
     def is_empty(self):
         '''
         Return `True` if form is valid and contains an empty lookup.
@@ -130,10 +124,7 @@ class FilterFormBase(forms.Form):
             not self.complex_conditions and
             not self.extra_conditions)
 
-
-class FilterForm(FilterFormBase):
-
-    def filter(self, queryset):
+    def filter_bulk(self, queryset):
         if self.is_valid():
             simple_lookups = self.simple_lookups
             complex_conditions = self.complex_conditions
@@ -146,10 +137,7 @@ class FilterForm(FilterFormBase):
         else:
             return queryset
 
-
-class ChainingFilterForm(FilterFormBase):
-
-    def filter(self, queryset):
+    def filter_chaining(self, queryset):
         if self.is_valid():
             simple_lookups = self.simple_lookups
             complex_conditions = self.complex_conditions
@@ -166,3 +154,13 @@ class ChainingFilterForm(FilterFormBase):
                     queryset = queryset.filter(query)
 
         return queryset
+
+
+class FilterForm(FilterFormBase):
+
+    use_filter_chaining = False
+
+
+class ChainingFilterForm(FilterFormBase):
+
+    use_filter_chaining = True
