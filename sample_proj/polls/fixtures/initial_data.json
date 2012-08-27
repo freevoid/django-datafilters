@@ -1,0 +1,107 @@
+[
+    {
+        "pk": 1,
+        "model": "polls.poll",
+        "fields": {
+            "pub_date": "2012-01-01T21:00:00",
+            "question": "What's up?"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "polls.poll",
+        "fields": {
+            "pub_date": "2012-04-06T13:00:00",
+            "question": "What's new?"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "polls.poll",
+        "fields": {
+            "pub_date": "2011-11-11T11:11:11",
+            "question": "What is the best web framework ever?"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Not much",
+            "poll": 1,
+            "votes": 10
+        }
+    },
+    {
+        "pk": 2,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "The sky",
+            "poll": 1,
+            "votes": 20
+        }
+    },
+    {
+        "pk": 3,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Just hacking again",
+            "poll": 1,
+            "votes": 90
+        }
+    },
+    {
+        "pk": 4,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Nothing",
+            "poll": 2,
+            "votes": 10
+        }
+    },
+    {
+        "pk": 5,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Just hacking again",
+            "poll": 2,
+            "votes": 6
+        }
+    },
+    {
+        "pk": 6,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Flask",
+            "poll": 3,
+            "votes": 35
+        }
+    },
+    {
+        "pk": 7,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Pyramid",
+            "poll": 3,
+            "votes": 90
+        }
+    },
+    {
+        "pk": 8,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Django",
+            "poll": 3,
+            "votes": 100500
+        }
+    },
+    {
+        "pk": 9,
+        "model": "polls.choice",
+        "fields": {
+            "choice_text": "Zope3",
+            "poll": 3,
+            "votes": 0
+        }
+    }
+]
