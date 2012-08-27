@@ -18,10 +18,6 @@ class DatePeriodFilterSpec(FilterSpec):
 
     field_cls = DatePeriodField
 
-    def __init__(self, field_name, label=None, **field_kwargs):
-        field_kwargs['label'] = label
-        super(DatePeriodFilterSpec, self).__init__(field_name, **field_kwargs)
-
     def to_lookup(self, picked_dates):
         if not isinstance(picked_dates, dict):
             return {}
@@ -60,10 +56,6 @@ class IsNullFilterSpec(FilterSpec):
 class InFilterSpec(FilterSpec):
 
     field_cls = CommaSeparatedCharField
-
-    def __init__(self, field_name, label=None, **field_kwargs):
-        field_kwargs['label'] = label
-        super(InFilterSpec, self).__init__(field_name, **field_kwargs)
 
     def to_lookup(self, values):
         if not values:

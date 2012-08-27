@@ -89,10 +89,6 @@ class DatePickFilterSpec(FilterSpec):
 
     field_cls = forms.DateField
 
-    def __init__(self, field_name, label=None, **field_kwargs):
-        field_kwargs['label'] = label
-        super(DatePickFilterSpec, self).__init__(field_name, **field_kwargs)
-
     def to_lookup(self, picked_date):
         if not isinstance(picked_date, datetime.date):
             return {}
@@ -112,10 +108,6 @@ class DatePickFilterSpec(FilterSpec):
 
 class ContainsFilterSpec(FilterSpec):
 
-    def __init__(self, field_name, label=None, **field_kwargs):
-        field_kwargs['label'] = label
-        super(ContainsFilterSpec, self).__init__(field_name, **field_kwargs)
-
     def to_lookup(self, substring):
         if not substring:
             return {}
@@ -123,10 +115,6 @@ class ContainsFilterSpec(FilterSpec):
 
 
 class BoolFilterSpec(FilterSpec):
-
-    def __init__(self, field_name, label=None, **field_kwargs):
-        field_kwargs['label'] = label
-        super(BoolFilterSpec, self).__init__(field_name, **field_kwargs)
 
     def to_lookup(self, checked):
         if checked is None:
