@@ -28,7 +28,7 @@ def filter_powered(filterform_cls, queryset_name='object_list', pass_params=Fals
                                         runtime_context=kwargs)
 
             # Perform actual filtering
-            queryset = filterform.filter(queryset)
+            queryset = filterform.filter(queryset).distinct()
 
             if add_count:
                 context[queryset_name + '_count'] = queryset.count()
