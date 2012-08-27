@@ -3,6 +3,7 @@ import datetime
 from django.test import TestCase
 from django import forms
 
+from datafilters.filterspec import FilterSpec
 from datafilters.filterform import FilterForm
 from datafilters.specs import builtin
 
@@ -155,9 +156,9 @@ class DatePickTestCase(FilterSpecTestMixin, TestCase):
     ]
 
 
-class GenericTestCase(FilterSpecTestMixin, TestCase):
+class BaseFilterSpecTestCase(FilterSpecTestMixin, TestCase):
 
-    spec_cls = builtin.GenericSpec
+    spec_cls = FilterSpec
 
     test_patterns = [
         ('', {}),
@@ -165,6 +166,11 @@ class GenericTestCase(FilterSpecTestMixin, TestCase):
         (100, {'foo': 100}),
         (datetime.date(2012, 1, 1), {'foo': datetime.date(2012, 1, 1)}),
     ]
+
+
+class GenericTestCase(BaseFilterSpecTestCase):
+
+    spec_cls = builtin.GenericSpec
 
 
 class SelectBoolTestCase(FilterSpecTestMixin, TestCase):
