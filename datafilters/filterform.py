@@ -73,11 +73,11 @@ class FilterFormBase(forms.Form):
             else:
                 lookup_or_condition = spec.to_lookup(raw_value)
 
-            if isinstance(lookup_or_condition, Q):
-                complex_conditions.append(lookup_or_condition)
+            if isinstance(lookup_or_condition, Q) and lookup_or_condition:
+                    complex_conditions.append(lookup_or_condition)
             elif isinstance(lookup_or_condition, Extra):
                 extra_conditions.append(lookup_or_condition)
-            elif lookup_or_condition is not None:
+            elif lookup_or_condition:
                 simple_lookups.append(lookup_or_condition)
 
         self.simple_lookups = simple_lookups
@@ -164,5 +164,5 @@ class ChainingFilterForm(FilterFormBase):
             for query in complex_conditions:
                 if query:
                     queryset = queryset.filter(query)
-        else:
-            return queryset
+
+        return queryset

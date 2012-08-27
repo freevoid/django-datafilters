@@ -75,6 +75,12 @@ class FilterSpecTestMixin(object):
         self.assertItemsEqual(spec.to_lookup(None), {})
         self.assertItemsEqual(spec.to_lookup(''), {})
 
+        class Form(FilterForm):
+            my_field = spec
+
+        f = Form({})
+        self.assertTrue(f.is_empty())
+
 
 class BoolTestCase(FilterSpecTestMixin, TestCase):
 
