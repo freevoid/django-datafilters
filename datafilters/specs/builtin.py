@@ -2,6 +2,7 @@
 Basic filterspecs that can also be used as startpoint for custom ones.
 '''
 import datetime
+import warnings
 
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -22,13 +23,11 @@ __all__ = (
 
 class GenericSpec(FilterSpec):
 
-    def __init__(self, field_name, label=None, field_cls=None, **field_kwargs):
-        if field_cls is not None:
-            self.field_cls = field_cls
-
-        # NOTE: for backward compatibility
-        field_kwargs['label'] = label
-        super(GenericSpec, self).__init__(field_name, **field_kwargs)
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'GenericSpec is deprecated. Use datafilters.filterspec.FilterSpec',
+            DeprecationWarning)
+        super(GenericSpec, self).__init__(*args, **kwargs)
 
 
 class DateFieldFilterSpec(FilterSpec):
