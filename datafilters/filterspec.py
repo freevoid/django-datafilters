@@ -10,14 +10,15 @@ class FilterSpec(object):
     creation_counter = 0
     field_cls = forms.CharField
 
-    def __init__(self, field_name, filter_field=None, **field_kwargs):
+    def __init__(self, field_name, verbose_name=None,
+            filter_field=None, field_cls=None,
+            **field_kwargs):
 
         # NOTE: Backward compatibility: previously label was provided with
         # `verbose_name` attribute
-        old_label = field_kwargs.pop('verbose_name', None)
         if field_kwargs.get('label') is None:
-            if old_label is not None:
-                field_kwargs['label'] = old_label
+            if verbose_name is not None:
+                field_kwargs['label'] = verbose_name
 
         self.field_name = field_name
 
@@ -26,7 +27,9 @@ class FilterSpec(object):
         else:
             base_kwargs = self.get_field_kwargs()
             base_kwargs.update(field_kwargs)
-            self.filter_field = (self.get_field_cls(), base_kwargs)
+            if field_cls is None:
+                field_cls = self.get_field_cls()
+            self.filter_field = (field_cls, base_kwargs)
 
         self.creation_counter = FilterSpec.creation_counter + 1
         FilterSpec.creation_counter = self.creation_counter

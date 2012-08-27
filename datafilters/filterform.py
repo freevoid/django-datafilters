@@ -42,10 +42,13 @@ class FilterFormBase(forms.Form):
 
         # Generate form fields
         for name, spec in self.filter_specs.iteritems():
-            field_cls, local_field_kwargs = spec.filter_field
-            field_kwargs = self.default_fields_args.copy()
-            field_kwargs.update(local_field_kwargs)
-            self.fields[name] = field_cls(**field_kwargs)
+            if isinstance(spec.filter_field, forms.Field):
+                self.fields[name] = spec.filter_field
+            else:
+                field_cls, local_field_kwargs = spec.filter_field
+                field_kwargs = self.default_fields_args.copy()
+                field_kwargs.update(local_field_kwargs)
+                self.fields[name] = field_cls(**field_kwargs)
 
         self.spec_count = len(self.filter_specs)
 
