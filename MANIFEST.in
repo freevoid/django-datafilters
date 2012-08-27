@@ -1,3 +1,4 @@
 include README.rst
 include LICENSE
 recursive-include datafilters/locale *
+recursive-include sample_proj *
