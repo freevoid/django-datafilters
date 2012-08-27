@@ -17,11 +17,15 @@ Main features:
 
 * forms-based declaration and usage;
 * simple API;
-* easy to implement and reuse abstract filter specs;
+* easy to implement and reuse abstract filter specs of any complexity (from
+  standard lookups to ``QuerySet.extra`` calls);
+* runtime-aware filtering;
 * a number of builtin specs for simple cases.
 
 Usage
 =====
+
+For concrete usage example, see ``sample_proj/polls/views.py``.
 
 To perform filtering one must define a subclass of
 ``datafilters.filterform.FilterForm`` (base class for filter forms).
@@ -40,7 +44,7 @@ For example purposes we will use models from django tutorial:
 The typical filter form looks like that::
 
     from datafilters.filterform import FilterForm
-    from datafilters.specs import GenericSpec, ContainsFilterSpec, \
+    from datafilters.specs import ContainsFilterSpec, \
         SelectBoolFilterSpec
 
     class ChoicesFilterForm(FilterForm):
