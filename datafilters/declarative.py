@@ -40,7 +40,7 @@ def get_declared_fields(bases, attrs, cls_filter,
 def declarative_fields(cls_filter, meta_base=type, extra_attr_name='base_fields'):
     """
     Metaclass that converts Field attributes to a dictionary called
-    'base_fields', taking into account parent class 'base_fields' as well.
+    'base_fields', taking into account parent class 'cls_filter'.
     """
     def __new__(cls, name, bases, attrs):
         attrs[extra_attr_name] = fields = get_declared_fields(bases, attrs, cls_filter,
