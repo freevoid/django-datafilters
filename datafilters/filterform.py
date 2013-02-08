@@ -18,7 +18,7 @@ def join_dicts(dicts):
 
 class FilterFormBase(forms.Form):
 
-    __metaclass__ = declarative_fields(FilterSpec, forms.Form.__metaclass__,
+    __metaclass__ = declarative_fields(FilterSpec, type(forms.Form),
                                        'filter_specs_base')
 
     default_fields_args = {'required': False}
