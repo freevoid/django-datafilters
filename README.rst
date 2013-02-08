@@ -4,7 +4,7 @@
 Abstract
 ========
 
-Library to implement queryset filtering for django-powered websites without pain.
+Library to implement reusable queryset filtering for django-powered websites.
 
 This library provides a way to declaratively define filter specifications in a
 django-forms manner. Such forms can be used as ordinary django forms and they
@@ -122,4 +122,4 @@ Requirements
 
 Copyright
 =========
-2010-2012, Nikolay Zakharov.
+2010-2013, Nikolay Zakharov.
