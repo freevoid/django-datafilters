@@ -11,6 +11,7 @@ class FilterFormMixin(MultipleObjectMixin):
     """
     filter_form_cls = None
     use_filter_chaining = False
+    context_filterform_name = 'filterform'
 
     def get_filter(self):
         return self.filter_form_cls(self.request.GET,
@@ -24,7 +25,7 @@ class FilterFormMixin(MultipleObjectMixin):
 
     def get_context_data(self, **kwargs):
         context = super(FilterFormMixin, self).get_context_data(**kwargs)
-        context['filterform'] = self.get_filter()
+        context[self.context_filterform_name] = self.get_filter()
         return context
 
     def get_runtime_context(self):
