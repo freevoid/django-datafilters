@@ -20,7 +20,9 @@ class FilterFormMixin(MultipleObjectMixin):
 
     def get_queryset(self):
         qs = super(FilterFormMixin, self).get_queryset()
-        qs = self.get_filter().filter(qs).distinct()
+        filter_form = self.get_filter()
+        if filter_form.is_valid():
+            qs = filter_form.filter(qs).distinct()
         return qs
 
     def get_context_data(self, **kwargs):
