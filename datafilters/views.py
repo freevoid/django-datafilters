@@ -1,12 +1,9 @@
-try:
-    from django.views.generic.base import ContextMixin as mixin_base
-except ImportError:
-    mixin_base = object
+from django.views.generic.list import MultipleObjectMixin
 
 __all__ = ('FilterFormMixin',)
 
 
-class FilterFormMixin(mixin_base):
+class FilterFormMixin(MultipleObjectMixin):
     """
     Mixin that adds filtering behaviour for Class Based Views.
     Changed in a way that can play nicely with other CBV simply by overriding the get_queryset(self) and
